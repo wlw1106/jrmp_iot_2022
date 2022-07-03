@@ -4,7 +4,7 @@
 const char* ssid = "########"; // your wifi SSID
 const char* password = "########"; // your wifi password
 
-#define TOKEN "0ltoOWWpxAltNsyXWQpA"
+#define TOKEN "0ltoOWWpxAltNsyXWQpA" // thinksboard TOKEN (https://demo.thingsboard.io/dashboard/31615a60-f9c5-11ec-b8bd-8161cb0d156d?publicId=02100d50-f9c6-11ec-b8bd-8161cb0d156d)
 
 int number;
 
