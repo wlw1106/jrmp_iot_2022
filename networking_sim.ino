@@ -1,8 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-const char* ssid = "Lik Wai的iPhone";
-const char* password = "00000000";
+const char* ssid = "########";
+const char* password = "########";
 
 #define TOKEN "0ltoOWWpxAltNsyXWQpA"
 
