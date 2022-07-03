@@ -1,8 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-const char* ssid = "########";
-const char* password = "########";
+const char* ssid = "########"; // your wifi SSID
+const char* password = "########"; // your wifi password
 
 #define TOKEN "0ltoOWWpxAltNsyXWQpA"
 
