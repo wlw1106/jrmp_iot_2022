@@ -86,7 +86,9 @@ void loop() {
   if ( !client.connected() ) {
     reconnect();
   }
-  if (analogRead2() < B && analogRead1() < F) {
+  read2 = analogRead2();
+  read1 = analogRead1();
+  if (read2 < B && read1 < F) {
     delay(500);
     lcd.clear();
     lcd.print("Please DO NOT block the corridor!!");
