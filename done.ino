@@ -52,24 +52,19 @@ void setup() {
   pinMode(Pin_D2, OUTPUT);
   lcd.clear();
   lcd.print("Counting...");
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
+  check_distance();
   distance1 = duration * 0.034 / 2;
   digitalWrite(Pin_D1, HIGH); // Turn D1 On
   digitalWrite(Pin_D2, LOW); // Turn D2 Off
   delay(200);
   Serial.print(analogRead(0));
-  F = analogRead(0) - 200;
+  F = analogRead(0) - 100;
   delay(200);
   Serial.print(" | ");
   digitalWrite(Pin_D1, LOW); //  Turn D1 Off
   digitalWrite(Pin_D2, HIGH); // Turn D2 On
   Serial.print(analogRead(0));
-  B = analogRead(0) - 200;
+  B = analogRead(0) - 100;
   if (distance1 != 0) {
     Serial.print(" | Distance1: ");
     Serial.print(distance1);
@@ -112,13 +107,18 @@ void loop() {
     if (readD2 < B) { // A0 300 A1 100
       check_distance();
       print_analog("1");
+      distance2 = duration * 0.034 / 2;
       print_distance("2", distance2);
 
       digitalWrite(Pin_D1, HIGH);
       digitalWrite(Pin_D2, LOW);
       while (analogRead(0) > F) {
-        delay(200);
-        Serial.print(".");
+        digitalWrite(Pin_D1, LOW);
+        digitalWrite(Pin_D2, HIGH);
+        if (analogRead(0) > B){
+          delay(200);
+          Serial.print(".");
+        }
       }
 
       check_distance();
@@ -126,7 +126,7 @@ void loop() {
       print_analog("2");
       print_distance("3", distance3);
 
-      if (distance3 != distance2) {
+      if (distance3 < distance2) {
         lcd.clear();
         amount += 1;
         lcd.print(amount);
@@ -140,14 +140,18 @@ void loop() {
     if (readD1 < F) { // A0 100 A1 300
       check_distance();
       print_analog("3");
+      distance2 = duration * 0.034 / 2;
       print_distance("2", distance2);
 
       digitalWrite(Pin_D1, LOW);
       digitalWrite(Pin_D2, HIGH);
-
       while (analogRead(0) > B) {
-        delay(200);
-        Serial.print(".");
+        digitalWrite(Pin_D1, HIGH);
+        digitalWrite(Pin_D2, LOW);
+        if (analogRead(0) > F){
+          delay(200);
+          Serial.print(".");
+        }
       }
 
       check_distance();
@@ -155,7 +159,7 @@ void loop() {
       print_analog("4");
       print_distance("3", distance3);
 
-      if (distance2 != distance3) {
+      if (distance2 < distance3) {
         lcd.clear();
         amount -= 1;
         lcd.print(amount);
