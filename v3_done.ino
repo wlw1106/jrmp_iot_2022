@@ -196,7 +196,7 @@ void record(String str) {
     print_analog("2");
     print_distance("3", distance3);
 
-    if (distance3 > distance2) {
+    if (distance3 < distance2) {
       lcd.clear();
       amount += 1;
       lcd.print(amount);
@@ -222,7 +222,7 @@ void record(String str) {
     print_analog("4");
     print_distance("3", distance3);
 
-    if (distance2 > distance3) {
+    if (distance2 < distance3) {
       lcd.clear();
       amount -= 1;
       lcd.print(amount);
