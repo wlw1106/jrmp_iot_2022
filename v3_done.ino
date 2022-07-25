@@ -29,6 +29,8 @@ int Pin_D2 = 2; // D4, B
 int readD1;
 int readD2;
 bool setItOnce = false;
+int runXTimes = 0;
+String record_d = "";
 
 void setup() {
   lcd.init();
@@ -54,19 +56,8 @@ void setup() {
   lcd.print("Counting...");
   check_distance();
   distance1 = duration * 0.034 / 2;
-  digitalWrite(Pin_D1, HIGH); // Turn D1 On
-  digitalWrite(Pin_D2, LOW); // Turn D2 Off
-  delay(200);
-  Serial.print(analogRead(0));
-  F = analogRead(0) - 100;
-  delay(200);
-  Serial.print(" | ");
-  digitalWrite(Pin_D1, LOW); //  Turn D1 Off
-  digitalWrite(Pin_D2, HIGH); // Turn D2 On
-  Serial.print(analogRead(0));
-  B = analogRead(0) - 100;
   if (distance1 != 0) {
-    Serial.print(" | Distance1: ");
+    Serial.print("Distance1: ");
     Serial.print(distance1);
     Serial.println(" cm");
   }
@@ -89,10 +80,50 @@ void loop() {
     reconnect();
   }
 
+  if (runXTimes < 1) {
+    delay(1000);
+    F = analogRead1() - 50;
+    delay(200);
+    B = analogRead2() - 50;
+    delay(200);
+    if ((B - F) > 100) {
+      F = analogRead1() - 50;
+      delay(200);
+    }
+    if ((F - B) > 100) {
+      B = analogRead2() - 50;
+      delay(200);
+    }
+    Serial.print(F);
+    Serial.print(" | ");
+    Serial.println(B);
+    runXTimes++;
+  }
+
   readD1 = analogRead1();
   delay(200);
   readD2 = analogRead2();
   delay(200);
+
+  if ((B - readD2) > 200) {
+    F = analogRead1() - 50;
+    delay(200);
+    B = analogRead2() - 50;
+    delay(200);
+    Serial.print("Calibration: ");
+    Serial.print(F);
+    Serial.print(" | ");
+    Serial.println(B);
+  } else if ((F - readD1) > 200) {
+    F = analogRead1() - 50;
+    delay(200);
+    B = analogRead2() - 50;
+    delay(200);
+    Serial.print("Calibration: ");
+    Serial.print(F);
+    Serial.print(" | ");
+    Serial.println(B);
+  }
 
   if (readD2 < B && readD1 < F) {
     delay(1000);
@@ -105,70 +136,10 @@ void loop() {
     return;
   } else {
     if (readD2 < B) { // A0 300 A1 100
-      check_distance();
-      print_analog("1");
-      distance2 = duration * 0.034 / 2;
-      print_distance("2", distance2);
-
-      digitalWrite(Pin_D1, HIGH);
-      digitalWrite(Pin_D2, LOW);
-      while (analogRead(0) > F) {
-        digitalWrite(Pin_D1, LOW);
-        digitalWrite(Pin_D2, HIGH);
-        if (analogRead(0) > B){
-          delay(200);
-          Serial.print(".");
-        }
-      }
-
-      check_distance();
-      distance3 = duration * 0.034 / 2;
-      print_analog("2");
-      print_distance("3", distance3);
-
-      if (distance3 < distance2) {
-        lcd.clear();
-        amount += 1;
-        lcd.print(amount);
-        getAndSendData();
-        Serial.println(amount);
-        delay(1000);
-        setItOnce = false;
-        return;
-      }
+      record("B");
     }
     if (readD1 < F) { // A0 100 A1 300
-      check_distance();
-      print_analog("3");
-      distance2 = duration * 0.034 / 2;
-      print_distance("2", distance2);
-
-      digitalWrite(Pin_D1, LOW);
-      digitalWrite(Pin_D2, HIGH);
-      while (analogRead(0) > B) {
-        digitalWrite(Pin_D1, HIGH);
-        digitalWrite(Pin_D2, LOW);
-        if (analogRead(0) > F){
-          delay(200);
-          Serial.print(".");
-        }
-      }
-
-      check_distance();
-      distance3 = duration * 0.034 / 2;
-      print_analog("4");
-      print_distance("3", distance3);
-
-      if (distance2 < distance3) {
-        lcd.clear();
-        amount -= 1;
-        lcd.print(amount);
-        getAndSendData();
-        Serial.println(amount);
-        delay(1000);
-        setItOnce = false;
-        return;
-      }
+      record("F");
     }
   }
 }
@@ -207,6 +178,76 @@ void check_distance() {
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
+}
+
+void record(String str) {
+  record_d = record_d + str;
+  Serial.println(record_d);
+  if (record_d == "F") {
+    check_distance();
+    print_analog("1");
+    distance2 = duration * 0.034 / 2;
+    print_distance("2", distance2);
+    delay(1000);
+    return;
+  } else if (record_d == "FB") {
+    check_distance();
+    distance3 = duration * 0.034 / 2;
+    print_analog("2");
+    print_distance("3", distance3);
+
+    if (distance3 < distance2) {
+      lcd.clear();
+      amount += 1;
+      lcd.print(amount);
+      getAndSendData();
+      Serial.println(amount);
+      setItOnce = false;
+    } else {
+      Serial.println("invalid");
+    }
+    delay(1000);
+    record_d = "";
+    return;
+  } else if (record_d == "B") {
+    check_distance();
+    print_analog("3");
+    distance2 = duration * 0.034 / 2;
+    print_distance("2", distance2);
+    delay(1000);
+    return;
+  } else if (record_d == "BF") {
+    check_distance();
+    distance3 = duration * 0.034 / 2;
+    print_analog("4");
+    print_distance("3", distance3);
+
+    if (distance2 < distance3) {
+      lcd.clear();
+      amount -= 1;
+      lcd.print(amount);
+      getAndSendData();
+      Serial.println(amount);
+      setItOnce = false;
+    } else {
+      Serial.println("invalid");
+    }
+    delay(1000);
+    record_d = "";
+    return;
+  }  else if (record_d == "FF") {
+    Serial.println("Cancel (Front and Front)");
+    delay(1000);
+    record_d = "";
+  }  else if (record_d == "BB") {
+    Serial.println("Cancel (Back and Back)");
+    delay(1000);
+    record_d = "";
+  } else {
+    Serial.println("invalid");
+    delay(1000);
+    record_d = "";
+  }
 }
 
 void reconnect() { // Loop until we're reconnected
