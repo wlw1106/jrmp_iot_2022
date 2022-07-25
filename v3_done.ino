@@ -82,16 +82,16 @@ void loop() {
 
   if (runXTimes < 1) {
     delay(1000);
-    F = analogRead1() - 80;
+    F = analogRead1() - 50;
     delay(200);
-    B = analogRead2() - 80;
+    B = analogRead2() - 50;
     delay(200);
     if ((B - F) > 100) {
-      F = analogRead1() - 80;
+      F = analogRead1() - 50;
       delay(200);
     }
     if ((F - B) > 100) {
-      B = analogRead2() - 80;
+      B = analogRead2() - 50;
       delay(200);
     }
     Serial.print(F);
@@ -106,18 +106,18 @@ void loop() {
   delay(100);
 
   if ((B - readD2) > 200) {
-    F = analogRead1() - 50;
+    F = analogRead1() - 80;
     delay(200);
-    B = analogRead2() - 50;
+    B = analogRead2() - 80;
     delay(200);
     Serial.print("Calibration: ");
     Serial.print(F);
     Serial.print(" | ");
     Serial.println(B);
   } else if ((F - readD1) > 200) {
-    F = analogRead1() - 50;
+    F = analogRead1() - 80;
     delay(200);
-    B = analogRead2() - 50;
+    B = analogRead2() - 80;
     delay(200);
     Serial.print("Calibration: ");
     Serial.print(F);
