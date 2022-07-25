@@ -63,13 +63,13 @@ void setup() {
   }
 }
 
-int analogRead1() {
+int analogRead1() { // F
   digitalWrite(Pin_D1, HIGH); // Turn D1 On
   digitalWrite(Pin_D2, LOW); // Turn D2 Off
   return analogRead(0);
 }
 
-int analogRead2() {
+int analogRead2() { // B
   digitalWrite(Pin_D1, LOW); //  Turn D1 On
   digitalWrite(Pin_D2, HIGH); // Turn D2 Off
   return analogRead(0);
@@ -101,9 +101,9 @@ void loop() {
   }
 
   readD1 = analogRead1();
-  delay(200);
+  delay(100);
   readD2 = analogRead2();
-  delay(200);
+  delay(100);
 
   if ((B - readD2) > 200) {
     F = analogRead1() - 50;
@@ -196,7 +196,7 @@ void record(String str) {
     print_analog("2");
     print_distance("3", distance3);
 
-    if (distance3 < distance2) {
+    if (distance3 > distance2) {
       lcd.clear();
       amount += 1;
       lcd.print(amount);
@@ -222,7 +222,7 @@ void record(String str) {
     print_analog("4");
     print_distance("3", distance3);
 
-    if (distance2 < distance3) {
+    if (distance2 > distance3) {
       lcd.clear();
       amount -= 1;
       lcd.print(amount);
